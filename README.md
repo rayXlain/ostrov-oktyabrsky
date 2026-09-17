@@ -1,32 +1,54 @@
 # Остров Октябрьский — лендинг
 
-## Что куда деплоить
+## Где сайт живёт
+
+**<https://rayxlain.github.io/ostrov-oktyabrsky/>** — GitHub Pages, ветка `gh-pages`
+репозитория <https://github.com/rayXlain/ostrov-oktyabrsky>.
 
 Готовый сайт лежит в **`dist/`**. Это обычная статика: `index.html`, `styles.css`,
-`app.js`, `assets/` и служебные файлы. Никакой сборки на стороне Netlify не нужно.
+`app.js`, `assets/` и служебные файлы. Сборки на стороне хостинга не нужно.
 
-### Вариант 1 — перетащить папку (самый быстрый)
-
-1. Открыть <https://app.netlify.com/drop>
-2. Перетащить туда **папку `dist`** целиком (не её содержимое и не zip).
-3. Netlify выдаст адрес вида `random-name-123.netlify.app` — его можно переименовать
-   в настройках проекта (*Site configuration → Change site name*).
-
-### Вариант 2 — через CLI
-
-```bash
-npx netlify-cli deploy --dir dist --prod
-```
-
-### После первого деплоя
-
-В `build.mjs` наверху стоит `SITE_URL = 'https://ostrov-oktyabrsky.netlify.app'`.
-Поменяйте на реальный адрес и пересоберите — иначе canonical, OG-картинка и
-sitemap будут указывать не туда:
+### Как переделеплоить
 
 ```bash
 node build.mjs
+git add -A && git commit -m "правки"
+git push
+git subtree push --prefix dist origin gh-pages
 ```
+
+Последняя строка и есть публикация: содержимое `dist/` уезжает в корень ветки
+`gh-pages`, откуда GitHub Pages его отдаёт. Сборка появляется на сайте через
+10–60 секунд.
+
+Если `subtree push` откажется из-за расхождения истории:
+
+```bash
+git push origin `git subtree split --prefix dist main`:gh-pages --force
+```
+
+### Если менять адрес
+
+В `build.mjs` наверху стоит `SITE_URL`. При смене адреса (другой репозиторий,
+свой домен) поменяйте его и пересоберите — иначе canonical, OG-картинка и
+sitemap будут указывать не туда.
+
+### Почему не Netlify и не Cloudflare Pages
+
+Пробовали оба, с этой сети не работают:
+
+- `*.netlify.app` — отдача обрывается на ~20 КБ, страница открывается только
+  потому что под brotli влезает в 16 КБ, картинки не доходят вообще.
+- `*.pages.dev` — соединение рвётся на рукопожатии по имени хоста. Тот же IP
+  Cloudflare с другим SNI отвечает нормально, то есть режется домен.
+
+Cloudflare заработает, если привязать свой домен — проект `ostrov-oktyabrsky`
+в аккаунте уже залит, нужен только домен в настройках Pages. Конфиги обоих
+хостингов лежат в репозитории: `netlify.toml` и `src/_headers`.
+
+GitHub Pages свои заголовки не поддерживает, `_headers` там не читается —
+статика отдаётся с `Cache-Control: max-age=600`. На Cloudflare и Netlify
+`?v=<хэш>` у CSS и JS позволяет кэшировать их на год.
 
 ## Структура
 
