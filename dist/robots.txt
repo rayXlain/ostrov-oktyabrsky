@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rayxlain.github.io/ostrov-oktyabrsky/sitemap.xml

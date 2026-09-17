@@ -1,0 +1,421 @@
+/* Остров Октябрьский — слой оформления и анимации.
+   Разметка лендинга живёт на инлайновых стилях (наследие исходника),
+   поэтому здесь: базовые стили, компонентные классы (их навешивает build.mjs)
+   и вся моторика — reveal, параллакс, ховеры, пасхалка. */
+
+:root {
+  --ac: #d19a5c;
+  --ink: #0b0c0e;
+  --ink-2: #14161a;
+  --paper: #f3f1ec;
+  --paper-2: #e6e2d9;
+  --mute: #a9a7a1;
+  --ease: cubic-bezier(.16, .84, .3, 1);
+  --ease-soft: cubic-bezier(.22, 1, .36, 1);
+  --rail-top: 57px;
+}
+
+* { box-sizing: border-box }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'Golos Text', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-wrap: pretty;
+}
+
+a { color: var(--ac); text-decoration: none }
+a:hover { color: #fff }
+::selection { background: var(--ac); color: var(--ink) }
+img { display: block }
+
+:focus-visible {
+  outline: 2px solid var(--ac);
+  outline-offset: 3px;
+}
+
+/* якоря не уезжают под фиксированную шапку */
+section[id],
+article[id] { scroll-margin-top: 76px }
+
+/* ── зерно поверх страницы: маскирует апскейл фото, добавляет «плёнку» ── */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  opacity: .05;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+  background-size: 160px 160px;
+}
+
+/* ── прогресс-бар ── */
+#progress {
+  transition: width .12s linear;
+  box-shadow: 0 0 16px rgba(209, 154, 92, .55);
+}
+
+/* ── шапка ── */
+.site-header {
+  transition: transform .55s var(--ease), background-color .45s ease, border-color .45s ease;
+  will-change: transform;
+}
+.site-header.is-hidden { transform: translate3d(0, -102%, 0) }
+.site-header.is-solid { background: rgba(11, 12, 14, .88) !important }
+
+.nav-link {
+  position: relative;
+  color: var(--mute);
+  transition: color .35s ease;
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  height: 1px;
+  background: var(--ac);
+  transform: scaleX(0);
+  transform-origin: 100% 50%;
+  transition: transform .45s var(--ease);
+}
+.nav-link:hover,
+.nav-link.is-current { color: var(--paper) }
+.nav-link:hover::after,
+.nav-link.is-current::after { transform: scaleX(1); transform-origin: 0 50% }
+
+.lang-btn {
+  font: inherit;
+  letter-spacing: .14em;
+  color: var(--ink);
+  background: var(--ac);
+  border: 0;
+  padding: 8px 14px;
+  cursor: pointer;
+  border-radius: 999px;
+  transition: transform .35s var(--ease), box-shadow .35s ease, filter .35s ease;
+}
+.lang-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(209, 154, 92, .34) }
+.lang-btn:active { transform: translateY(0) scale(.96) }
+
+/* ── герой ── */
+.hero-media .kb {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.js .hero-media { clip-path: inset(0 0 100% 0) }
+.js.is-loaded .hero-media {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 1.4s var(--ease);
+}
+.is-loaded .hero-media .kb { animation: kenburns 32s ease-in-out infinite alternate }
+
+.js .hero-body > * { opacity: 0 }
+.js.is-loaded .hero-body > * { animation: heroRise 1.05s var(--ease) both }
+.js.is-loaded .hero-body > *:nth-child(1) { animation-delay: .22s }
+.js.is-loaded .hero-body > *:nth-child(2) { animation-delay: .3s }
+.js.is-loaded .hero-body > *:nth-child(3) { animation-delay: .62s }
+
+.hero-body h1 span { display: inline-block }
+.js .hero-body h1 span { opacity: 0 }
+.js.is-loaded .hero-body h1 span { animation: lineRise 1s var(--ease) both }
+.js.is-loaded .hero-body h1 span:nth-of-type(1) { animation-delay: .34s }
+.js.is-loaded .hero-body h1 span:nth-of-type(2) { animation-delay: .44s }
+.js.is-loaded .hero-body h1 span:nth-of-type(3) { animation-delay: .54s }
+
+.scroll-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: rgba(243, 241, 236, .5);
+  transition: opacity .5s ease;
+}
+.scroll-hint::after {
+  content: "";
+  width: 1px;
+  height: 46px;
+  background: linear-gradient(180deg, var(--ac), rgba(209, 154, 92, 0));
+  transform-origin: 50% 0;
+  animation: hintPulse 2.4s var(--ease) infinite;
+}
+.scroll-hint.is-gone { opacity: 0 }
+@media (max-width: 760px) { .scroll-hint { display: none } }
+
+/* ── появление блоков при скролле ── */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 26px, 0);
+}
+.js [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity .85s var(--ease) var(--rd, 0ms),
+    transform .95s var(--ease) var(--rd, 0ms);
+}
+
+.js [data-reveal-x] {
+  opacity: 0;
+  transform: translate3d(34px, 0, 0);
+}
+.js [data-reveal-x].is-in {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity .7s var(--ease) var(--rd, 0ms),
+    transform .8s var(--ease) var(--rd, 0ms);
+}
+
+/* Картинки: штора сверху вниз + медленный отъезд масштаба.
+   clip-path живёт на самой картинке, а не на обёртке: IntersectionObserver
+   считает полностью обрезанный элемент невидимым и никогда бы её не показал. */
+.js [data-reveal-img] img { clip-path: inset(0 0 100% 0) }
+.js [data-reveal-img].is-in img {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 1.15s var(--ease) var(--rd, 0ms);
+}
+.js [data-reveal-img]:not([data-parallax]) img {
+  transform: scale(1.12);
+  transition: transform 1.5s var(--ease) var(--rd, 0ms), filter .6s ease;
+}
+.js [data-reveal-img]:not([data-parallax]).is-in img {
+  transform: scale(1);
+  transition:
+    transform 1.5s var(--ease) var(--rd, 0ms),
+    clip-path 1.15s var(--ease) var(--rd, 0ms),
+    filter .6s ease;
+}
+.js [data-reveal-img]:not([data-parallax]).is-in:hover img { transform: scale(1.055) }
+[data-reveal-img][data-parallax] img { transition: filter .6s ease }
+[data-reveal-img][data-parallax]:hover img { filter: brightness(1.08) saturate(1.04) }
+
+/* ── хронология ── */
+.timeline-scroller {
+  cursor: grab;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(209, 154, 92, .5) transparent;
+  overscroll-behavior-x: contain;
+}
+.timeline-scroller.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+  user-select: none;
+}
+.timeline-scroller::-webkit-scrollbar { height: 3px }
+.timeline-scroller::-webkit-scrollbar-thumb { background: rgba(209, 154, 92, .5) }
+.timeline-scroller::-webkit-scrollbar-track { background: transparent }
+.tl-card { transition: background-color .45s var(--ease) }
+.tl-card:hover { background: var(--ink-2) !important }
+
+/* ── рейка каталога ── */
+#rail {
+  top: var(--rail-top) !important;
+  transition: top .55s var(--ease);
+  scrollbar-width: none;
+}
+#rail::-webkit-scrollbar { display: none }
+
+.rail-link {
+  isolation: isolate;
+  position: relative;
+  overflow: hidden;
+  flex: 0 0 auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .12em;
+  color: var(--mute);
+  padding: 8px 14px;
+  border: 1px solid rgba(243, 241, 236, .14);
+  white-space: nowrap;
+  transition: color .4s var(--ease), border-color .4s var(--ease);
+}
+.rail-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--ac);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform .45s var(--ease);
+}
+.rail-link:hover { color: var(--paper); border-color: rgba(243, 241, 236, .38) }
+.rail-link.is-active {
+  color: var(--ink);
+  border-color: var(--ac);
+}
+.rail-link.is-active::before { transform: scaleX(1) }
+
+/* ── карточки застройщиков ── */
+.player-card {
+  transition: transform .5s var(--ease), box-shadow .5s var(--ease);
+}
+.player-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 0 1px var(--ac), 0 20px 44px rgba(11, 12, 14, .14) !important;
+}
+
+/* ── источники ── */
+.source-link { transition: color .35s ease, padding-left .45s var(--ease) }
+.source-link:hover { color: #fff; padding-left: 10px }
+.source-link span:last-child { transition: transform .45s var(--ease) }
+.source-link:hover span:last-child { transform: translate(5px, -5px) }
+
+/* ── переключение языка ── */
+.is-swapping [data-en] {
+  opacity: .25;
+  transition: opacity .16s ease;
+}
+[data-en] { transition: opacity .3s ease .05s }
+
+/* ── футер и пасхалка ── */
+.back-to-top { transition: color .3s ease }
+.back-to-top:hover { color: var(--paper) !important }
+
+.egg {
+  position: relative;
+  max-width: 1440px;
+  margin: 26px auto 0;
+  min-height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.egg-dot {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 6px 12px;
+  cursor: default;
+  color: rgba(243, 241, 236, .16);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1;
+  transition: color .4s ease, letter-spacing .4s var(--ease);
+}
+.egg-dot:hover { color: rgba(209, 154, 92, .5); letter-spacing: .3em }
+.egg-text {
+  position: absolute;
+  margin: 0;
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 300;
+  font-size: clamp(14px, 2.2vw, 22px);
+  letter-spacing: -.01em;
+  color: var(--ac);
+  text-transform: none;
+  text-align: center;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(10px) scale(.92);
+  pointer-events: none;
+  transition: opacity .35s ease, transform .35s var(--ease);
+}
+.egg.is-open .egg-dot { opacity: 0 }
+.egg.is-open .egg-text {
+  opacity: 1;
+  transform: none;
+  animation: eggPop .8s var(--ease);
+}
+.flea {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--ac);
+  opacity: .9;
+  pointer-events: none;
+  animation: fleaHop 1.6s var(--ease) infinite;
+}
+
+/* ── ключевые кадры ── */
+@keyframes heroRise {
+  from { opacity: 0; transform: translate3d(0, 34px, 0) }
+  to { opacity: 1; transform: none }
+}
+@keyframes lineRise {
+  from { opacity: 0; transform: translate3d(0, .4em, 0) }
+  to { opacity: 1; transform: none }
+}
+@keyframes kenburns {
+  from { transform: scale(1) translate3d(0, 0, 0) }
+  to { transform: scale(1.09) translate3d(-1%, -1%, 0) }
+}
+@keyframes hintPulse {
+  0% { transform: scaleY(.2); opacity: .2 }
+  40% { transform: scaleY(1); opacity: 1 }
+  100% { transform: scaleY(.2); opacity: .2 }
+}
+@keyframes eggPop {
+  0% { transform: translateY(10px) scale(.92) rotate(-2deg) }
+  45% { transform: translateY(-4px) scale(1.06) rotate(1.5deg) }
+  70% { transform: translateY(1px) scale(.99) rotate(-.6deg) }
+  100% { transform: none }
+}
+@keyframes fleaHop {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1) }
+  35% { transform: translate3d(6px, -16px, 0) scale(.8) }
+  70% { transform: translate3d(-4px, -6px, 0) scale(1.1) }
+}
+
+/* ── мобильные ── */
+@media (max-width: 760px) {
+  .site-header nav .nav-link { display: none }
+  section[id], article[id] { scroll-margin-top: 60px }
+}
+
+@media (max-width: 480px) {
+  .egg-text { white-space: normal; line-height: 1.3 }
+}
+
+/* ── бережный режим ── */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto }
+  *,
+  *::before,
+  *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  .js [data-reveal],
+  .js [data-reveal-x],
+  .js .hero-body > *,
+  .js .hero-body h1 span {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .js [data-reveal-img] img,
+  .js .hero-media { clip-path: none !important }
+  .js [data-reveal-img] img { transform: none !important }
+  .scroll-hint { display: none }
+}
+
+/* страховка: если скрипт упал, контент всё равно показывается */
+.reveal-all [data-reveal],
+.reveal-all [data-reveal-x],
+.reveal-all .hero-body > *,
+.reveal-all .hero-body h1 span {
+  opacity: 1 !important;
+  transform: none !important;
+}
+.reveal-all [data-reveal-img] img,
+.reveal-all .hero-media { clip-path: none !important }
+.reveal-all [data-reveal-img] img { transform: none !important }

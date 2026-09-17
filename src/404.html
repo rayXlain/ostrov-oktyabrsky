@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Страница не найдена — Остров Октябрьский</title>
+<meta name="robots" content="noindex" />
+<meta name="theme-color" content="#0b0c0e" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin" />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@200;300&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+<style>
+  :root { --ac: #d19a5c }
+  * { box-sizing: border-box }
+  body {
+    margin: 0;
+    min-height: 100svh;
+    display: grid;
+    align-content: center;
+    gap: 28px;
+    padding: clamp(24px, 6vw, 80px);
+    background: #0b0c0e;
+    color: #f3f1ec;
+    font-family: 'Unbounded', system-ui, sans-serif;
+    font-weight: 200;
+  }
+  .code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: var(--ac);
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(34px, 7vw, 92px);
+    line-height: 1;
+    letter-spacing: -.03em;
+    font-weight: 200;
+    animation: rise 1s cubic-bezier(.16, .84, .3, 1) both .1s;
+  }
+  p {
+    margin: 0;
+    max-width: 44ch;
+    font-size: clamp(15px, 1.4vw, 19px);
+    line-height: 1.6;
+    color: #98958e;
+    animation: rise 1s cubic-bezier(.16, .84, .3, 1) both .22s;
+  }
+  a {
+    justify-self: start;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: #0b0c0e;
+    background: var(--ac);
+    padding: 12px 20px;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: transform .35s cubic-bezier(.16, .84, .3, 1), box-shadow .35s ease;
+    animation: rise 1s cubic-bezier(.16, .84, .3, 1) both .34s;
+  }
+  a:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(209, 154, 92, .32) }
+  @keyframes rise { from { opacity: 0; transform: translateY(24px) } to { opacity: 1; transform: none } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important } }
+</style>
+</head>
+<body>
+  <div class="code">404 — страница не найдена</div>
+  <h1>Такого адреса<br />на острове нет</h1>
+  <p>Возможно, ссылка устарела. Вернитесь на главную — там десять объектов, хронология и схема застройки.</p>
+  <a href="/">На главную →</a>
+</body>
+</html>
