@@ -59,9 +59,9 @@ assets/                      исходные изображения
 src/                         то, что добавляется поверх исходника:
   styles.css                   оформление и анимации
   app.js                       вся интерактивность без зависимостей
-  favicon.svg, 404.html, netlify.toml
+  favicon.svg, 404.html, netlify.toml, _headers
 build.mjs                    сборка: исходник + src → dist
-dist/                        ← это и есть сайт для Netlify
+dist/                        ← это и есть сайт, его и публикуем
 export/                      старый самодостаточный файл (см. ниже)
 ```
 
@@ -76,7 +76,7 @@ export/                      старый самодостаточный фай�
   `fetchpriority="high"` (меньше сдвигов вёрстки, быстрее первый экран);
 - собирает `<head>`: title, description, canonical, Open Graph, Twitter Card,
   JSON-LD, иконки, `robots.txt`, `sitemap.xml`;
-- добавляет `?v=<хэш>` к CSS и JS, поэтому в `netlify.toml` они кэшируются на год,
+- добавляет `?v=<хэш>` к CSS и JS, поэтому в `netlify.toml` и `_headers` они кэшируются на год,
   а HTML — всегда свежий;
 - копирует только те изображения, что реально есть на странице.
 
